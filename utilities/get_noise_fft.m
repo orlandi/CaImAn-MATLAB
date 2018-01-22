@@ -32,6 +32,7 @@
         
         Fs = 1;        
         ff = 0:Fs/N:Fs/2;
+        range_ff
         indf=ff>range_ff(1);
         indf(ff>range_ff(2))=0;
         if dims > 1

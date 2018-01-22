@@ -8,6 +8,7 @@ nam = 'demoMovie.tif';          % insert path to tiff stack here
 sframe=1;						% user input: first frame to read (optional, default 1)
 num2read=2000;					% user input: how many frames to read   (optional, default until the end)
 Y = read_file(nam,sframe,num2read);
+%%
 
 %Y = Y - min(Y(:)); 
 if ~isa(Y,'single');    Y = single(Y);  end         % convert to single
@@ -33,7 +34,9 @@ options = CNMFSetParms(...
     );
 %% Data pre-processing
 
-[P,Y] = preprocess_data(Y,p);
+[P,Y] = preprocess_data(Y,p, options);
+
+
 %% fast initialization of spatial components using greedyROI and HALS
 
 [Ain,Cin,bin,fin,center] = initialize_components(Y,K,tau,options,P);  % initialize
@@ -48,7 +51,7 @@ figure;imagesc(Cn);
 
 
     %% manually refine components (optional)
-refine_components = false;  % flag for manual refinement
+refine_components = true;  % flag for manual refinement
 if refine_components
     [Ain,Cin,center] = manually_refine_components(Y,Ain,Cin,center,Cn,tau,options);
 end
@@ -68,11 +71,11 @@ ind_corr = rval_space > options.space_thresh;           % components that pass t
                                         % this test will keep processes
                                         
 %% further classification with cnn_classifier
-try  % matlab 2017b or later is needed
+%try  % matlab 2017b or later is needed
     [ind_cnn,value] = cnn_classifier(A,[d1,d2],'cnn_model',options.cnn_thr);
-catch
-    ind_cnn = true(size(A,2),1);                        % components that pass the CNN classifier
-end     
+%catch
+%    ind_cnn = true(size(A,2),1);                        % components that pass the CNN classifier
+%end     
                             
 %% event exceptionality
 
@@ -136,6 +139,6 @@ figure;
 plot_components_GUI(Yr,A_or,C_or,b2,f2,Cn,options);
 
 %% make movie
-if (0)  
+if (1)  
     make_patch_video(A_or,C_or,b2,f2,Yr,Coor,options)
 end
